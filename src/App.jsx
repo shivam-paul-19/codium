@@ -1,13 +1,15 @@
-import { useState } from 'react';
-import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import FormPage from './formPage'
+import './Form.css' // Ensure styles are available if needed globally, though FormPage imports it too.
 
 function App() {
-  const [count, setCount] = useState(0);
   return (
-    <>
-      <h1>Codium</h1>
-    </>
-  );
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<FormPage />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App
