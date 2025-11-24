@@ -98,6 +98,21 @@
     letter-spacing: 0.5px;
 }
 
+.new-room-btn {
+    margin-top: 10px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #b060f7 0%, #fefefe 100%);
+    color: black;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 1;
+    letter-spacing: 0.5px;
+}
+
 .submit-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);

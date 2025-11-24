@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Toaster } from 'sonner'
 import FormPage from './formPage'
 import CodeEditor from './editor'
 import './Form.css' // Ensure styles are available if needed globally, though FormPage imports it too.
@@ -6,6 +7,7 @@ import './Form.css' // Ensure styles are available if needed globally, though Fo
 function App() {
   return (
     <BrowserRouter>
+      <Toaster />
       <Routes>
         <Route path="/" element={<FormPage />} />
         <Route path="/editor" element={<CodeEditor />} />

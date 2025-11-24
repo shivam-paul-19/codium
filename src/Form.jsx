@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import './Form.css'
+import { v4 as uuidv4 } from 'uuid'
+import { toast } from "sonner"
 
 const Form = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +20,16 @@ const Form = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Form submitted:', formData)
+  }
+
+  const handleNewRoom = () => {
+    // generate a unique room id
+    const roomId = uuidv4()
+    setFormData(prev => ({
+      ...prev,
+      roomId: roomId
+    }))
+    toast.success("New room created!")
   }
 
   return (
@@ -55,6 +67,9 @@ const Form = () => {
 
       <button type="submit" className="submit-btn">
         Enter
+      </button>
+      <button type="button" className="new-room-btn" onClick={handleNewRoom}>
+        New room
       </button>
     </form>
   )
