@@ -10,7 +10,7 @@ function App() {
       <Toaster />
       <Routes>
         <Route path="/" element={<FormPage />} />
-        <Route path="/editor" element={<CodeEditor />} />
+        <Route path="/editor/:roomid" element={<CodeEditor />} />
       </Routes>
     </BrowserRouter>
   )

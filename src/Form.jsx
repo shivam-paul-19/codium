@@ -2,8 +2,14 @@ import { useState } from 'react'
 import './Form.css'
 import { v4 as uuidv4 } from 'uuid'
 import { toast } from "sonner"
+import { useNavigate } from 'react-router-dom'
+import { io } from 'socket.io-client'
+
+const socket = io("http://localhost:8080");
 
 const Form = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     roomId: ''
@@ -14,12 +20,32 @@ const Form = () => {
     setFormData(prev => ({
       ...prev,
       [name]: value
-    }))
+    }));
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Form submitted:', formData)
+    e.preventDefault();
+    let user = {
+      userName: e.target[0].value,
+      meeting_id: e.target[1].value,
+      unique_id: Date.now()
+    }
+
+    socket.emit("joined", user);
+    let userList = [];
+    socket.on("allUsers", (users) => {
+      userList = users;
+      console.log(userList);
+    });
+    
+    setTimeout(() => {
+      navigate(`/editor/${e.target[1].value}`, {
+        state: {
+          users: userList,
+          currentUser: user
+        }
+      });
+    }, 1000);
   }
 
   const handleNewRoom = () => {
