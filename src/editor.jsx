@@ -16,6 +16,7 @@ const CodeEditor = () => {
   const currUser = state.currentUser;
 
   let [ppl, setPpl] = useState(state.users);
+  let [editorVal, setEditorVal] = useState("// Write your code here")
   
   // socket
   useEffect(() => {
@@ -34,12 +35,16 @@ const CodeEditor = () => {
       setPpl(users);
     });
 
+    
     return () => {
       socket.off("newJoin");
       socket.off("disconnect_user");
     };
   }, []);
-
+  
+  socket.on("newCode", (code) => {
+    setEditorVal(code);
+  });
 
   const handleCopyId = () => {
     toast.success("Room ID copied!");
@@ -53,6 +58,10 @@ const CodeEditor = () => {
       navigate("/");
       toast.info("Room left");
     }, 1000);
+  }
+
+  const handleEditorChange = (e) => {
+    socket.emit("change", e);
   }
   
   return (
@@ -79,7 +88,8 @@ const CodeEditor = () => {
       <Editor
         height="90vh"
         defaultLanguage="javascript"
-        defaultValue="// Write your code here"
+        value={editorVal}
+          onChange={handleEditorChange}
         theme="vs-dark"
         options={{
           quickSuggestions: false,
