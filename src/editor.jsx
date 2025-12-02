@@ -5,9 +5,7 @@ import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { io } from 'socket.io-client'
-
-const socket = io("http://localhost:8080");
+import { socket } from './socket';
 
 const CodeEditor = () => {
   const navigate = useNavigate();
@@ -16,13 +14,14 @@ const CodeEditor = () => {
   const currUser = state.currentUser;
 
   let [ppl, setPpl] = useState(state.users);
-  let [editorVal, setEditorVal] = useState("// Write your code here")
+  let [editorVal, setEditorVal] = useState("// Write your code here");
+
+  let currRoom = window.location.pathname.slice(8);
   
   // socket
   useEffect(() => {
     // When SOMEONE ELSE joins
     socket.on("newJoin", (user) => {
-      console.log("running 2");
       console.log(user);
       setPpl(prev => [
         ...prev,
@@ -43,12 +42,13 @@ const CodeEditor = () => {
   }, []);
   
   socket.on("newCode", (code) => {
+    console.log(code);
     setEditorVal(code);
   });
 
   const handleCopyId = () => {
     toast.success("Room ID copied!");
-    navigator.clipboard.writeText(window.location.pathname.slice(8));
+    navigator.clipboard.writeText(currRoom);
   }
 
   const handleLeave = () => {
@@ -61,7 +61,7 @@ const CodeEditor = () => {
   }
 
   const handleEditorChange = (e) => {
-    socket.emit("change", e);
+    socket.emit("change", {room_id:currRoom, val:e});
   }
   
   return (
@@ -89,7 +89,7 @@ const CodeEditor = () => {
         height="90vh"
         defaultLanguage="javascript"
         value={editorVal}
-          onChange={handleEditorChange}
+        onChange={handleEditorChange}
         theme="vs-dark"
         options={{
           quickSuggestions: false,

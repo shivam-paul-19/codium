@@ -24,22 +24,38 @@ server.listen(port, (req, res) => {
   console.log("listening to port 8080");
 });
 
-let users = [];
+let rooms = new Map();
 
 io.on("connection", (socket) => {
   socket.on("joined", (user) => {
+    // get the room/meeting id
+    let room_id = user.meeting_id;
+
+    // check if that room exists
+    if(!rooms.has(room_id)) {
+      rooms.set(room_id, []);
+    }
+
+    // get users form the room
+    let users = rooms.get(room_id);
+
+    // add user
     users.push(user);
+
+    // join the socket in the room
+    socket.join(room_id);
+
     console.log(users);
     io.emit("allUsers", users);
-    io.emit("newJoin", user);
+    io.to(room_id).emit("newJoin", user);    
   });
 
-  socket.on("leave", (u_id) => {
-    users = users.filter((u) => u.unique_id !== u_id);
-    io.emit("disconnect_user", users);
-  });
+  // socket.on("leave", (u_id) => {
+  //   users = users.filter((u) => u.unique_id !== u_id);
+  //   io.emit("disconnect_user", users);
+  // });
 
-  socket.on("change", (val) => {
-    io.emit("newCode", val);
+  socket.on("change", ({room_id, val}) => {
+    io.to(room_id).emit("newCode", val);
   })
 });

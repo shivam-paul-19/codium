@@ -3,9 +3,7 @@ import './Form.css'
 import { v4 as uuidv4 } from 'uuid'
 import { toast } from "sonner"
 import { useNavigate } from 'react-router-dom'
-import { io } from 'socket.io-client'
-
-const socket = io("http://localhost:8080");
+import { socket } from './socket';
 
 const Form = () => {
   const navigate = useNavigate();
