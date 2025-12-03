@@ -121,3 +121,18 @@
 .submit-btn:active {
     transform: translateY(0);
 }
+
+.logo {
+    height: 80px;
+}
+
+.logo-container {
+    text-align: center;
+    font-size: 25px;
+}
+
+.separator {
+    width: 200px;
+    /* background-color: #3a0ca3; */
+    height: 50px;
+}
