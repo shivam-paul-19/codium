@@ -31,16 +31,21 @@ const Form = () => {
 
     socket.emit("joined", user);
     let userList = [];
+    let defContent = "";
     socket.on("allUsers", (users) => {
       userList = users;
-      console.log(userList);
+    });
+
+    socket.on("getContent", (content) => {
+      defContent = content; 
     });
     
     setTimeout(() => {
       navigate(`/editor/${e.target[1].value}`, {
         state: {
           users: userList,
-          currentUser: user
+          currentUser: user,
+          defContent: defContent
         }
       });
     }, 1000);

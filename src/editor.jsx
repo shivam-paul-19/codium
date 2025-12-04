@@ -7,14 +7,17 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { socket } from './socket';
 
+let lastSend = 0;
 const CodeEditor = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state;
   const currUser = state.currentUser;
 
+  const defVal = (state.defContent == "")? "// Write your code here" : state.defContent;
+
   let [ppl, setPpl] = useState(state.users);
-  let [editorVal, setEditorVal] = useState("// Write your code here");
+  let [editorVal, setEditorVal] = useState(defVal);
 
   let currRoom = window.location.pathname.slice(8);
   
@@ -25,7 +28,7 @@ const CodeEditor = () => {
       console.log(user);
       setPpl(prev => [
         ...prev,
-        { userId: prev.length + 1, userName: user.userName }
+        { userId: prev.length + 1, userName: user.userName, userColor: user.userColor }
       ]);
     });
 
@@ -33,7 +36,6 @@ const CodeEditor = () => {
       console.log(users);
       setPpl(users);
     });
-
     
     return () => {
       socket.off("newJoin");
@@ -53,16 +55,25 @@ const CodeEditor = () => {
 
   const handleLeave = () => {
     console.log(currUser.unique_id);
-    socket.emit("leave", currUser.unique_id);
+    socket.emit("leave", {u_id: currUser.unique_id, room_id: currRoom});
     setTimeout(() => {
       navigate("/");
       toast.info("Room left");
     }, 1000);
   }
 
-  const handleEditorChange = (e) => {
-    socket.emit("change", {room_id:currRoom, val:e});
-  }
+  const handleEditorChange = (value) => {
+    setEditorVal(value); // Update editor locally
+
+    const now = Date.now();
+
+    // Allow emit only once every 120ms (adjustable)
+    if (now - lastSend > 500) {
+      console.log(lastSend, now);
+      socket.emit("change", { room_id: currRoom, val: value });
+      lastSend = now;
+    }
+  };
   
   return (
     <>
@@ -74,7 +85,7 @@ const CodeEditor = () => {
           {
             ppl.map((user, index) => {
               let c = Math.floor(Math.random()*5);
-              return <Person key={index} username={user.userName} color={c}/>
+              return <Person key={index} username={user.userName} color={user.userColor}/>
             })
           }
           </div>
