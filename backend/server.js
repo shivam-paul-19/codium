@@ -20,6 +20,10 @@ app.use(
   })
 );
 
+app.get("/test", (req, res) => {
+  res.send("all right");
+})
+
 export { app, server, io };
 
 if (process.env.NODE_ENV !== "test") {
