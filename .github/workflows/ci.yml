@@ -6,6 +6,8 @@ name: Server CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'        # only run when backend changes
 
 jobs:
   build:
