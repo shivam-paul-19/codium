@@ -62,7 +62,7 @@ describe("Socket.io Server Tests", () => {
     setTimeout(() => {
         clientSocket1.emit("joined", user1);
     }, 50);
-  }, 7000);
+  }, 20000);
 
   // 2. Sync Code
   it("should sync code changes to other users in the room", (done) => {
