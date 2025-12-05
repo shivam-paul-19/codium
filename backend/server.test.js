@@ -27,9 +27,7 @@ beforeAll((done) => {
     clientSocket2.on("connect", onConnect);
     clientSocket3.on("connect", onConnect);
 
-    setTimeout(() => {
-      done()
-    }, 5000);
+    setTimeout(done, 1000);
   });
 });
 
