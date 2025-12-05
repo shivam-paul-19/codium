@@ -29,7 +29,7 @@ beforeAll((done) => {
 
     setTimeout(() => {
       done()
-    }, 1000);
+    }, 5000);
   });
 });
 
