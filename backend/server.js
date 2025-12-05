@@ -63,7 +63,7 @@ io.on("connection", (socket) => {
       io.emit("getContent", room_content.get(room_id));
     }
 
-    io.emit("allUsers", users);
+    io.to(room_id).emit("allUsers", users);
     io.to(room_id).emit("newJoin", user);    
   });
 
