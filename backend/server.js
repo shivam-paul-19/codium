@@ -60,7 +60,7 @@ io.on("connection", (socket) => {
     socket.join(room_id);
 
     if(room_content.has(room_id)) {
-      io.emit("getContent", room_content.get(room_id));
+      socket.emit("getContent", room_content.get(room_id));
     }
 
     io.to(room_id).emit("allUsers", users);

@@ -46,24 +46,24 @@ describe("Socket.io Server Tests", () => {
   const user3 = { meeting_id: otherRoomId, userName: "UserThree", unique_id: "u3" };
 
   // 1. Join
-  it("1) should allow a user to join a room and notify others", async () => {
-    const room = `room_${Date.now()}_${Math.random()}`;
+  it("should allow a user to join a room and notify others", async () => {
+    const room = roomId;
 
     const allUsersPromise = new Promise((resolve) => {
       clientSocket2.on("allUsers", resolve);     // client2 listens BEFORE joining
     });
 
-    clientSocket1.emit("joined", { meeting_id: room, name: "Shivam" });
-
+    clientSocket1.emit("joined", user1);
+    
     await new Promise(res => setTimeout(res, 300)); // give server time to register
 
-    clientSocket2.emit("joined", { meeting_id: room, name: "User2" });
+    clientSocket2.emit("joined", user2);
 
     const users = await allUsersPromise; // WAIT until event is received
 
     expect(users.length).toBe(2);
-    expect(users.some(u => u.name === "Shivam")).toBe(true);
-    expect(users.some(u => u.name === "User2")).toBe(true);
+    expect(users.some(u => u.userName === user1.userName)).toBe(true);
+    expect(users.some(u => u.userName === user2.userName)).toBe(true);
   }, 15000);    // CI safe timeout
 
 
