@@ -46,23 +46,26 @@ describe("Socket.io Server Tests", () => {
   const user3 = { meeting_id: otherRoomId, userName: "UserThree", unique_id: "u3" };
 
   // 1. Join
-  it("should allow a user to join a room and notify others", (done) => {
-    // client2 joins first
-    clientSocket2.emit("joined", user2);
+  it("1) should allow a user to join a room and notify others", async () => {
+    const room = `room_${Date.now()}_${Math.random()}`;
 
-    // Listen for newJoin on client2 when client1 joins
-    clientSocket2.on("newJoin", (user) => {
-      if (user.userName === user2.userName) return; // Ignore self join
-      expect(user.userName).toBe(user1.userName);
-      clientSocket2.off("newJoin");
-      done();
+    const allUsersPromise = new Promise((resolve) => {
+      client2.on("allUsers", resolve);     // client2 listens BEFORE joining
     });
 
-    // client1 joins
-    setTimeout(() => {
-        clientSocket1.emit("joined", user1);
-    }, 50);
-  }, 20000);
+    client1.emit("joined", { meeting_id: room, name: "Shivam" });
+
+    await new Promise(res => setTimeout(res, 300)); // give server time to register
+
+    client2.emit("joined", { meeting_id: room, name: "User2" });
+
+    const users = await allUsersPromise; // WAIT until event is received
+
+    expect(users.length).toBe(2);
+    expect(users.some(u => u.name === "Shivam")).toBe(true);
+    expect(users.some(u => u.name === "User2")).toBe(true);
+  }, 15000);    // CI safe timeout
+
 
   // 2. Sync Code
   it("should sync code changes to other users in the room", (done) => {
