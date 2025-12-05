@@ -50,14 +50,14 @@ describe("Socket.io Server Tests", () => {
     const room = `room_${Date.now()}_${Math.random()}`;
 
     const allUsersPromise = new Promise((resolve) => {
-      client2.on("allUsers", resolve);     // client2 listens BEFORE joining
+      clientSocket2.on("allUsers", resolve);     // client2 listens BEFORE joining
     });
 
-    client1.emit("joined", { meeting_id: room, name: "Shivam" });
+    clientSocket1.emit("joined", { meeting_id: room, name: "Shivam" });
 
     await new Promise(res => setTimeout(res, 300)); // give server time to register
 
-    client2.emit("joined", { meeting_id: room, name: "User2" });
+    clientSocket2.emit("joined", { meeting_id: room, name: "User2" });
 
     const users = await allUsersPromise; // WAIT until event is received
 
