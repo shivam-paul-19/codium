@@ -37,7 +37,7 @@ jobs:
       run: sudo docker stop codium-server
 
     - name: delete the old container
-      run: sudo doker rm codium-server
+      run: sudo docker rm codium-server
 
     - name: delete the old image
       run: sudo docker rmi -f codium-server
