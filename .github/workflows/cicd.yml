@@ -33,8 +33,10 @@ jobs:
       run: npm test
 
     # deployment
-    - name: stop the current container and delete that
+    - name: stop the current container
       run: sudo docker stop codium-server
+
+    - name: delete the old container
       run: sudo doker rm codium-server
 
     - name: delete the old image
