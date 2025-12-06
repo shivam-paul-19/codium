@@ -35,9 +35,10 @@ jobs:
     # deployment
     - name: stop the current container and delete that
       run: sudo docker stop codium-server
+      run: sudo doker rm codium-server
 
     - name: delete the old image
-      run: sudo docker rmi codium-server
+      run: sudo docker rmi -f codium-server
 
     - name: build the new image
       run: sudo docker build -t codium-server .
