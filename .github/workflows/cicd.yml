@@ -31,3 +31,16 @@ jobs:
 
     - name: Run Tests
       run: npm test
+
+    # deployment
+    - name: stop the current container and delete that
+      run: sudo docker stop codium-server
+
+    - name: delete the old image
+      run: sudo docker rmi codium-server
+
+    - name: build the new image
+      run: sudo docker build -t codium-server .
+
+    - name: start the container with naming and port maping
+      run: sudo docker run --name codium-server -d -p 8080:8080 codium-server
