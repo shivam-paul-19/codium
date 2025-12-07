@@ -4,7 +4,7 @@ import {
 } from "@/components/ui/avatar";
 import "./person.css";
 
-function Person({username="User", color}) {
+function Person({username="User", color, isTyping}) {
     const extractInit = (name) => {
         // make an array
         let names = name.split(" ");
@@ -36,7 +36,11 @@ function Person({username="User", color}) {
                 <AvatarFallback style={{
                     backgroundColor: colors[color].bg,
                     color: colors[color].letter
-                }}>{extractInit(username)}</AvatarFallback>
+                }}>{
+                    (!isTyping)? extractInit(username) : (
+                        <span className="loading loading-dots loading-md"></span>
+                    )
+                }</AvatarFallback>
             </Avatar>
             <h1 className="username">{adjustName(username)}</h1>
         </div>

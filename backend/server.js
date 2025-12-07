@@ -90,5 +90,10 @@ io.on("connection", (socket) => {
 
     room_content.set(room_id, val);
     socket.to(room_id).emit("newCode", val);
-  })
+  });
+
+  socket.on("typing", ({user_id, room_id}) => {
+    console.log(user_id, room_id);
+    socket.to(room_id).emit("user_typing", user_id);
+  });
 })

@@ -20,6 +20,8 @@ const CodeEditor = () => {
   let [editorVal, setEditorVal] = useState(defVal);
 
   let currRoom = window.location.pathname.slice(8);
+
+  let [typing, setTyping] = useState(0);
   
   // socket
   useEffect(() => {
@@ -28,7 +30,7 @@ const CodeEditor = () => {
       console.log(user);
       setPpl(prev => [
         ...prev,
-        { userId: prev.length + 1, userName: user.userName, userColor: user.userColor }
+        { unique_id: user.unique_id, userName: user.userName, userColor: user.userColor }
       ]);
     });
 
@@ -48,6 +50,14 @@ const CodeEditor = () => {
     setEditorVal(code);
   });
 
+  socket.on("user_typing", (user_id) => {
+    console.log(user_id);
+    setTyping(user_id);
+    setTimeout(() => {
+      setTyping(0);
+    }, 1500);
+  });
+
   const handleCopyId = () => {
     toast.success("Room ID copied!");
     navigator.clipboard.writeText(currRoom);
@@ -63,13 +73,14 @@ const CodeEditor = () => {
   }
 
   const handleEditorChange = (value) => {
+    // console.log(currUser.unique_id);
     setEditorVal(value); // Update editor locally
-
+    
     const now = Date.now();
-
+    
     // Allow emit only once every 120ms (adjustable)
     if (now - lastSend > 150) {
-      console.log(lastSend, now);
+      socket.emit("typing", {user_id: currUser.unique_id, room_id: currRoom});
       socket.emit("change", { room_id: currRoom, val: value });
       lastSend = now;
     }
@@ -81,11 +92,12 @@ const CodeEditor = () => {
       <div className="side-bar">
         <div className="upper-side-bar">
         <h1 className='side-bar-head'>In the room</h1>
-        <div className="ppl">
+        <div className="ppl scroll-hidden overflow-y-scroll">
           {
-            ppl.map((user, index) => {
-              let c = Math.floor(Math.random()*5);
-              return <Person key={index} username={user.userName} color={user.userColor}/>
+            ppl.map((user) => {
+              return <Person key={user.unique_id} username={user.userName} color={user.userColor} isTyping={
+                typing === user.unique_id
+              }/>
             })
           }
           </div>
@@ -105,8 +117,7 @@ const CodeEditor = () => {
         options={{
           quickSuggestions: false,
           suggestOnTriggerCharacters: false,
-          minimap: { enabled: false }, // Optional: cleaner look
-          // padding: { top: 20, bottom: 20 } // Internal padding for the editor content
+          minimap: { enabled: false }
         }}
       />
     </div>

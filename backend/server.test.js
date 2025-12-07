@@ -158,8 +158,33 @@ describe("Socket.io Server Tests", () => {
           done();
       }, 200);
   });
+  // 7. Typing
+  it("should notify other users in the room when a user is typing", (done) => {
+    clientSocket2.on("user_typing", (userId) => {
+      expect(userId).toBe(user1.unique_id);
+      clientSocket2.off("user_typing");
+      done();
+    });
 
-  // 7. Cleanup
+    clientSocket1.emit("typing", { user_id: user1.unique_id, room_id: roomId });
+  });
+
+  it("should not notify users in other rooms when a user is typing", (done) => {
+    let received = false;
+    clientSocket3.on("user_typing", () => {
+      received = true;
+    });
+
+    clientSocket1.emit("typing", { user_id: user1.unique_id, room_id: roomId });
+
+    setTimeout(() => {
+      expect(received).toBe(false);
+      clientSocket3.off("user_typing");
+      done();
+    }, 200);
+  });
+
+  // 8. Cleanup
   it("should clean up room when last user leaves", (done) => {
       const tempRoom = "temp-room";
       const uTemp = { meeting_id: tempRoom, userName: "Temp", unique_id: "ut" };
