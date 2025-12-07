@@ -21,7 +21,7 @@ app.use(
 );
 
 app.get("/test", (req, res) => {
-  res.send("CI CD perfect!");
+  res.send("Typing action added!");
 })
 
 export { app, server, io };
