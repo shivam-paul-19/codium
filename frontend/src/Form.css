@@ -6,6 +6,64 @@
     height: 100vh;
 }
 
+.app-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mobile-warning {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 20px;
+}
+
+.mobile-warning h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.mobile-warning p {
+    font-size: 1.2rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+    .logo {
+        height: 60px;
+    }
+
+    .separator {
+        width: 100px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .logo-container,
+    .separator {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-content {
+        display: none;
+    }
+
+    .mobile-warning {
+        display: flex;
+    }
+}
+
 .glass-card {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(15px);

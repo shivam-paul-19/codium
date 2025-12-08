@@ -35,10 +35,14 @@ if (process.env.NODE_ENV !== "test") {
 let rooms = new Map();
 let room_content = new Map();
 
+// Map to track socket.id -> { room_id, user_id } for handling disconnects
+let socketMap = new Map();
+
 io.on("connection", (socket) => {
   socket.on("joined", (user) => {
     // get the room/meeting id
     let room_id = user.meeting_id;
+    let u_id = user.unique_id;
 
     // check if that room exists
     if(!rooms.has(room_id)) {
@@ -59,6 +63,9 @@ io.on("connection", (socket) => {
     // join the socket in the room
     socket.join(room_id);
 
+    // Map the socket id to the user details
+    socketMap.set(socket.id, { room_id, u_id });
+
     if(room_content.has(room_id)) {
       socket.emit("getContent", room_content.get(room_id));
     }
@@ -67,20 +74,37 @@ io.on("connection", (socket) => {
     io.to(room_id).emit("newJoin", user);    
   });
 
+  const handleLeaveOrDisconnect = (room_id, u_id) => {
+      if(!rooms.has(room_id)) return;
+
+      let users = rooms.get(room_id).filter((u) => u.unique_id !== u_id);
+
+      if (users.length === 0) {
+        rooms.delete(room_id);   // Remove entire room
+        room_content.delete(room_id);
+      } else {
+        rooms.set(room_id, users);
+      }
+
+      io.to(room_id).emit("disconnect_user", users);
+      socket.leave(room_id);
+      
+      // Remove from socket map if it exists (mostly for manual leave)
+      if (socketMap.has(socket.id)) {
+          socketMap.delete(socket.id);
+      }
+  };
+
   socket.on("leave", ({u_id, room_id}) => {
-    if(!rooms.has(room_id)) return;
+    handleLeaveOrDisconnect(room_id, u_id);
+  });
 
-    let users = rooms.get(room_id).filter((u) => u.unique_id !== u_id);
-
-    if (users.length === 0) {
-      rooms.delete(room_id);   // Remove entire room
-      room_content.delete(room_id);
-    } else {
-      rooms.set(room_id, users);
-    }
-
-    io.to(room_id).emit("disconnect_user", users);
-    socket.leave(room_id);
+  socket.on("disconnect", () => {
+      if (socketMap.has(socket.id)) {
+          const { room_id, u_id } = socketMap.get(socket.id);
+          console.log(`User ${u_id} disconnected from room ${room_id}`);
+          handleLeaveOrDisconnect(room_id, u_id);
+      }
   });
 
   socket.on("change", ({room_id, val}) => {

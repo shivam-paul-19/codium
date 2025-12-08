@@ -212,4 +212,38 @@ describe("Socket.io Server Tests", () => {
           }, 200);
       }, 100);
   });
+
+  // 9. Disconnect (Tab Close)
+  it("should notify others when a user abruptly disconnects", (done) => {
+    // Create a temporary client for this test
+    const clientTemp = Client(`http://localhost:${port}`);
+    const userTemp = { meeting_id: roomId, userName: "Disconnecter", unique_id: "ud" };
+
+    clientTemp.on("connect", () => {
+      clientTemp.emit("joined", userTemp);
+    });
+
+    // Validating join first isn't strictly necessary if we are testing the disconnect, 
+    // but ensures the server knows about the user.
+    // simpler: listen on client2 for the new join, THEN disconnect clientTemp.
+    
+    clientSocket2.on("newJoin", (joinedUser) => {
+      if (joinedUser.unique_id === userTemp.unique_id) {
+         // Now simulate tab close
+         setTimeout(() => {
+             clientTemp.close();
+         }, 100);
+      }
+    });
+
+    clientSocket2.on("disconnect_user", (remainingUsers) => {
+      // Check that userTemp is NOT in the remaining list
+      const found = remainingUsers.find(u => u.unique_id === userTemp.unique_id);
+      if(!found) {
+        clientSocket2.off("newJoin");
+        clientSocket2.off("disconnect_user");
+        done();
+      }
+    });
+  });
 });
