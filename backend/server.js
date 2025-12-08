@@ -102,7 +102,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
       if (socketMap.has(socket.id)) {
           const { room_id, u_id } = socketMap.get(socket.id);
-          console.log(`User ${u_id} disconnected from room ${room_id}`);
           handleLeaveOrDisconnect(room_id, u_id);
       }
   });
@@ -117,7 +116,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("typing", ({user_id, room_id}) => {
-    console.log(user_id, room_id);
     socket.to(room_id).emit("user_typing", user_id);
   });
 })
